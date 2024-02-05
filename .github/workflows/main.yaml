@@ -1,5 +1,5 @@
 ---
-  name: Build and push docker image
+  name: Build Docker Sql and Application Image
   on:
     push:
       branches:
