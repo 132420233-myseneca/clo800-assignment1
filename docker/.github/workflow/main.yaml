@@ -1,18 +1,15 @@
+---
 name: Build and push docker image
-
 on:
   push:
     branches:
       - master
-
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
       - name: Setup AWS ECR Details
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -20,19 +17,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{secrets.AWS_REGION}}
-
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-
-       - name: Build and push MySQL Docker image
-        run: |
+      - name: Build and push MySQL Docker image
+        run: >
           docker build -t mysql-container -f Dockerfile_mysql .
-          docker tag mysql-container:latest ${{ steps.login-ecr.outputs.registry }}/sql-image:mysql-latest
-          docker push ${{ steps.login-ecr.outputs.registry }}/sql-image:mysql-latest
 
+          docker tag mysql-container:latest ${{ steps.login-ecr.outputs.registry }}/sql-image:mysql-latest
+
+          docker push ${{ steps.login-ecr.outputs.registry }}/sql-image:mysql-latest
       - name: Build and push Web App Docker image
-        run: |
+        run: >
           docker build -t web-app-container -f Dockerfile .
+
           docker tag web-app-container:latest ${{ steps.login-ecr.outputs.registry }}/webapp-image:webapp-latest
+
           docker push ${{ steps.login-ecr.outputs.registry }}/webapp-image:webapp-latest
